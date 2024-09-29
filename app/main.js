@@ -131,7 +131,20 @@ function handleNumberLiteral(input, i) {
     i++; // Move to the next character
   }
 
-  const literalValue = isDecimal ? numberLiteral : `${numberLiteral}.0`;
+  // Determine the literal value based on whether it's an integer or decimal
+  let literalValue;
+  if (isDecimal) {
+    // Check if the number ends with all zeros after the decimal point
+    const decimalPart = numberLiteral.split('.')[1];
+    if (decimalPart && parseInt(decimalPart) === 0) {
+      literalValue = `${numberLiteral.split('.')[0]}.0`; // e.g., "51.0000" becomes "51.0"
+    } else {
+      literalValue = numberLiteral; // e.g., "1234.1234" remains "1234.1234"
+    }
+  } else {
+    literalValue = `${numberLiteral}.0`; // e.g., "51" becomes "51.0"
+  }
+
   console.log(`NUMBER ${numberLiteral} ${literalValue}`);
 
   return i; // Return updated index
