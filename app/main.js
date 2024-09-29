@@ -55,6 +55,7 @@ function tokenize(input) {
       while (i < input.length && input[i] !== "\n") {
         i++;
       }
+      line++; // Increment line number
       continue; // Skip the rest of the loop for this iteration
     }
 
