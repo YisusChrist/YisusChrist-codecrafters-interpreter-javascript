@@ -59,6 +59,11 @@ function tokenize(input) {
       continue; // Skip the rest of the loop for this iteration
     }
 
+    // Ignore whitespace characters (spaces, tabs, and newlines)
+    if (/\s/.test(char)) {
+      continue; // Skip this iteration for whitespace
+    }
+
     const nextChar = input[i + 1];
 
     if (char === "<" || char === ">") {
