@@ -19,11 +19,29 @@ console.error("Logs from your program will appear here!");
 
 const filename = args[1];
 
-// Uncomment this block to pass the first stage
+// Read the file content
 const fileContent = fs.readFileSync(filename, "utf8");
 
-if (fileContent.length !== 0) {
-  throw new Error("Scanner not implemented");
-} else {
+// Tokenizer function to scan for parentheses
+function tokenize(input) {
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i];
+
+    switch (char) {
+      case "(":
+        console.log("LEFT_PAREN ( null");
+        break;
+      case ")":
+        console.log("RIGHT_PAREN ) null");
+        break;
+      default:
+        // Ignore other characters for now
+        break;
+    }
+  }
+
+  // Print EOF token at the end
   console.log("EOF  null");
 }
+
+// Call the tokenizer with the file
