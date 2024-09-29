@@ -1,8 +1,79 @@
 import fs from "fs";
 
-// Tokenizer function to scan for parentheses, braces, operators, string literals, and other single-character tokens
+// Tokenizer function to scan for tokens
 function tokenize(input) {
-  const tokenMap = {
+  const tokenMap = createTokenMap();
+  let hasError = false;
+  let line = 1; // Start line number at 1
+
+  const handleComment = (i) => {
+    while (i < input.length && input[i] !== "\n") {
+      i++;
+    }
+    line++; // Increment line number
+    return i; // Return the updated index
+  };
+
+  const handleWhitespace = (char) => {
+    if (char === "\n") line++; // Increment line number on newlines
+  };
+
+  const reportError = (char) => {
+    console.error(`[line ${line}] Error: Unexpected character: ${char}`);
+    hasError = true;
+  };
+
+  const reportUnterminatedString = () => {
+    console.error(`[line ${line}] Error: Unterminated string.`);
+    hasError = true;
+  };
+
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i];
+
+    // Handle comments
+    if (char === "/" && input[i + 1] === "/") {
+      i = handleComment(i);
+      continue;
+    }
+
+    // Handle whitespace
+    if (/\s/.test(char)) {
+      handleWhitespace(char);
+      continue;
+    }
+
+    // Handle string literals
+    if (char === '"') {
+      i = handleStringLiteral(input, i);
+      continue;
+    }
+
+    // Handle number literals
+    if (/\d/.test(char)) {
+      i = handleNumberLiteral(input, i);
+      continue;
+    }
+
+    const nextChar = input[i + 1];
+    i = handleOperators(char, nextChar, i) || i;
+
+    // Check if character is a valid token
+    if (!tokenMap[char]) {
+      reportError(char);
+    }
+  }
+
+  console.log("EOF  null");
+
+  if (hasError) {
+    process.exit(65);
+  }
+}
+
+// Create a map of single-character tokens and their corresponding output
+function createTokenMap() {
+  return {
     "(": "LEFT_PAREN ( null",
     ")": "RIGHT_PAREN ) null",
     "{": "LEFT_BRACE { null",
@@ -19,100 +90,71 @@ function tokenize(input) {
     ">": "GREATER > null",
     "/": "SLASH / null",
   };
+}
 
-  let hasError = false;
-  let line = 1; // Start line number at 1
+function handleStringLiteral(input, i) {
+  let stringLiteral = '"'; // Start with the opening quote
+  i++; // Move past the opening quote
 
-  const handleRelationalOperators = (char, nextChar) => {
-    if (char === "<") {
+  while (i < input.length && input[i] !== '"') {
+    if (input[i] === "\n") line++; // Increment line number for newlines
+    stringLiteral += input[i]; // Append to the string literal
+    i++;
+  }
+
+  if (i < input.length && input[i] === '"') {
+    stringLiteral += '"'; // Close the string literal
+    console.log(`STRING ${stringLiteral} ${stringLiteral.slice(1, -1)}`);
+  } else {
+    reportUnterminatedString(); // Report error if string is not terminated
+  }
+
+  return i; // Return updated index
+}
+
+function handleNumberLiteral(input, i) {
+  let numberLiteral = input[i]; // Start with the first digit
+  let isDecimal = false; // Track if we've encountered a decimal point
+
+  while (i + 1 < input.length) {
+    const nextChar = input[i + 1];
+
+    if (/\d/.test(nextChar)) {
+      numberLiteral += nextChar; // Append digit
+    } else if (nextChar === "." && !isDecimal) {
+      numberLiteral += nextChar; // Append decimal point
+      isDecimal = true; // Mark that we have a decimal point
+    } else {
+      break; // Exit loop on non-digit, non-decimal
+    }
+
+    i++; // Move to the next character
+  }
+
+  const literalValue = isDecimal ? numberLiteral : `${numberLiteral}.0`;
+  console.log(`NUMBER ${numberLiteral} ${literalValue}`);
+
+  return i; // Return updated index
+}
+
+function handleOperators(char, nextChar, i) {
+  switch (char) {
+    case "<":
       console.log(nextChar === "=" ? "LESS_EQUAL <= null" : "LESS < null");
-    } else if (char === ">") {
+      return nextChar === "=" ? i + 1 : i; // Skip the next character if needed
+    case ">":
       console.log(
         nextChar === "=" ? "GREATER_EQUAL >= null" : "GREATER > null"
       );
-    }
-  };
-
-  const handleNegationOperator = (nextChar) => {
-    console.log(nextChar === "=" ? "BANG_EQUAL != null" : "BANG ! null");
-  };
-
-  const handleEqualityOperator = (nextChar) => {
-    console.log(nextChar === "=" ? "EQUAL_EQUAL == null" : "EQUAL = null");
-  };
-
-  const reportError = (char) => {
-    console.error(`[line ${line}] Error: Unexpected character: ${char}`);
-    hasError = true;
-  };
-
-  const reportUnterminatedString = () => {
-    console.error(`[line ${line}] Error: Unterminated string.`);
-    hasError = true;
-  };
-
-  for (let i = 0; i < input.length; i++) {
-    const char = input[i];
-
-    // Check for comments
-    if (char === "/" && input[i + 1] === "/") {
-      // Ignore everything after // until the end of the line
-      while (i < input.length && input[i] !== "\n") {
-        i++;
-      }
-      line++; // Increment line number
-      continue; // Skip the rest of the loop for this iteration
-    }
-
-    // Ignore whitespace characters (spaces, tabs, and newlines)
-    if (/\s/.test(char)) {
-      if (char === "\n") line++; // Increment line number on newlines
-      continue; // Skip this iteration for whitespace
-    }
-
-    // Check for string literals
-    if (char === '"') {
-      let stringLiteral = '"'; // Start with the opening quote
-      i++; // Move past the opening quote
-
-      while (i < input.length && input[i] !== '"') {
-        if (input[i] === "\n") line++; // Increment line number for newlines
-        stringLiteral += input[i]; // Append to the string literal
-        i++;
-      }
-
-      if (i < input.length && input[i] === '"') {
-        stringLiteral += '"'; // Close the string literal
-        console.log(`STRING ${stringLiteral} ${stringLiteral.slice(1, -1)}`);
-      } else {
-        reportUnterminatedString(); // Report error if string is not terminated
-      }
-
-      continue; // Skip the rest of the loop for this iteration
-    }
-
-    const nextChar = input[i + 1];
-
-    if (char === "<" || char === ">") {
-      handleRelationalOperators(char, nextChar);
-      if (nextChar === "=") i++; // Skip the next character
-    } else if (char === "!") {
-      handleNegationOperator(nextChar);
-      if (nextChar === "=") i++; // Skip the next character
-    } else if (char === "=") {
-      handleEqualityOperator(nextChar);
-      if (nextChar === "=") i++; // Skip the next character
-    } else if (tokenMap[char]) {
-      console.log(tokenMap[char]);
-    } else {
-      reportError(char);
-    }
-  }
-
-  console.log("EOF  null");
-
-  if (hasError) {
-    process.exit(65);
+      return nextChar === "=" ? i + 1 : i; // Skip the next character if needed
+    case "!":
+      console.log(nextChar === "=" ? "BANG_EQUAL != null" : "BANG ! null");
+      return nextChar === "=" ? i + 1 : i; // Skip the next character if needed
+    case "=":
+      console.log(nextChar === "=" ? "EQUAL_EQUAL == null" : "EQUAL = null");
+      return nextChar === "=" ? i + 1 : i; // Skip the next character if needed
+    default:
+      return null; // No operator handling needed
   }
 }
 
