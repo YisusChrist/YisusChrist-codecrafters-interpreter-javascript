@@ -15,6 +15,7 @@ function tokenize(input) {
     "+": "PLUS + null",
     ";": "SEMICOLON ; null",
     "=": "EQUAL = null",
+    "!": "BANG ! null",
   };
 
   let hasError = false; // Flag to track if there are any errors
@@ -22,8 +23,17 @@ function tokenize(input) {
   for (let i = 0; i < input.length; i++) {
     const char = input[i];
 
+    // Handle the negation operator (!)
+    if (char === "!") {
+      if (i + 1 < input.length && input[i + 1] === "=") {
+        console.log("BANG_EQUAL != null");
+        i++; // Skip the next character since we've consumed it
+      } else {
+        console.log("BANG ! null");
+      }
+    }
     // Handle the equality operator (==)
-    if (char === "=") {
+    else if (char === "=") {
       if (i + 1 < input.length && input[i + 1] === "=") {
         console.log("EQUAL_EQUAL == null");
         i++; // Skip the next character since we've consumed it
