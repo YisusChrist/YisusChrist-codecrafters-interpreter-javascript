@@ -1,6 +1,6 @@
 import fs from "fs";
 
-// Tokenizer function to scan for parentheses
+// Tokenizer function to scan for parentheses and braces
 function tokenize(input) {
   for (let i = 0; i < input.length; i++) {
     const char = input[i];
@@ -11,6 +11,12 @@ function tokenize(input) {
         break;
       case ")":
         console.log("RIGHT_PAREN ) null");
+        break;
+      case "{":
+        console.log("LEFT_BRACE { null");
+        break;
+      case "}":
+        console.log("RIGHT_BRACE } null");
         break;
       default:
         // Ignore other characters for now
