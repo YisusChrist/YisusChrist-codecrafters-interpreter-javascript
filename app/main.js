@@ -1,27 +1,5 @@
 import fs from "fs";
 
-const args = process.argv.slice(2); // Skip the first two arguments (node path and script path)
-
-if (args.length < 2) {
-  console.error("Usage: ./your_program.sh tokenize <filename>");
-  process.exit(1);
-}
-
-const command = args[0];
-
-if (command !== "tokenize") {
-  console.error(`Usage: Unknown command: ${command}`);
-  process.exit(1);
-}
-
-// You can use print statements as follows for debugging, they'll be visible when running tests.
-console.error("Logs from your program will appear here!");
-
-const filename = args[1];
-
-// Read the file content
-const fileContent = fs.readFileSync(filename, "utf8");
-
 // Tokenizer function to scan for parentheses
 function tokenize(input) {
   for (let i = 0; i < input.length; i++) {
@@ -44,4 +22,27 @@ function tokenize(input) {
   console.log("EOF  null");
 }
 
+const args = process.argv.slice(2); // Skip the first two arguments (node path and script path)
+
+if (args.length < 2) {
+  console.error("Usage: ./your_program.sh tokenize <filename>");
+  process.exit(1);
+}
+
+const command = args[0];
+
+if (command !== "tokenize") {
+  console.error(`Usage: Unknown command: ${command}`);
+  process.exit(1);
+}
+
+// You can use print statements as follows for debugging, they'll be visible when running tests.
+console.error("Logs from your program will appear here!");
+
+const filename = args[1];
+
+// Read the file content
+const fileContent = fs.readFileSync(filename, "utf8");
+
 // Call the tokenizer with the file
+tokenize(fileContent);
