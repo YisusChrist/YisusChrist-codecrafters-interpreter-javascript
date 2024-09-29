@@ -1,6 +1,6 @@
 import fs from "fs";
 
-// Tokenizer function to scan for parentheses and braces
+// Tokenizer function to scan for parentheses, braces, and other single-character tokens
 function tokenize(input) {
   // Define a map of single-character tokens and their corresponding output
   const tokenMap = {
@@ -16,19 +16,33 @@ function tokenize(input) {
     ";": "SEMICOLON ; null",
   };
 
+  let hasError = false; // Flag to track if there are any errors
+
   for (let i = 0; i < input.length; i++) {
     const char = input[i];
 
-    // Check if the character is a token we care about
+    // Check if the character is a valid token
     if (tokenMap[char]) {
-      console.log(tokenMap[char]);
+      console.log(tokenMap[char]); // Print valid tokens to stdout
+    } else {
+      // Report an error for invalid characters
+      if (!/\s/.test(char)) { // Ignore whitespace, but report invalid characters
+        console.error(`[line 1] Error: Unexpected character: ${char}`);
+        hasError = true;
+      }
     }
   }
 
   // Print EOF token at the end
   console.log("EOF  null");
+
+  // If any errors were detected, exit with code 65
+  if (hasError) {
+    process.exit(65);
+  }
 }
 
+// Handle command-line arguments
 const args = process.argv.slice(2); // Skip the first two arguments (node path and script path)
 
 if (args.length < 2) {
