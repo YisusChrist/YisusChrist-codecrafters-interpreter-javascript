@@ -1,6 +1,6 @@
 import fs from "fs";
 
-// Tokenizer function to scan for parentheses, braces, operators, and other single-character tokens
+// Tokenizer function to scan for parentheses, braces, operators, string literals, and other single-character tokens
 function tokenize(input) {
   const tokenMap = {
     "(": "LEFT_PAREN ( null",
@@ -17,7 +17,7 @@ function tokenize(input) {
     "!": "BANG ! null",
     "<": "LESS < null",
     ">": "GREATER > null",
-    "/": "SLASH / null", // Add the division operator
+    "/": "SLASH / null",
   };
 
   let hasError = false;
@@ -46,6 +46,11 @@ function tokenize(input) {
     hasError = true;
   };
 
+  const reportUnterminatedString = () => {
+    console.error(`[line ${line}] Error: Unterminated string.`);
+    hasError = true;
+  };
+
   for (let i = 0; i < input.length; i++) {
     const char = input[i];
 
@@ -63,6 +68,27 @@ function tokenize(input) {
     if (/\s/.test(char)) {
       if (char === "\n") line++; // Increment line number on newlines
       continue; // Skip this iteration for whitespace
+    }
+
+    // Check for string literals
+    if (char === '"') {
+      let stringLiteral = '"'; // Start with the opening quote
+      i++; // Move past the opening quote
+
+      while (i < input.length && input[i] !== '"') {
+        if (input[i] === "\n") line++; // Increment line number for newlines
+        stringLiteral += input[i]; // Append to the string literal
+        i++;
+      }
+
+      if (i < input.length && input[i] === '"') {
+        stringLiteral += '"'; // Close the string literal
+        console.log(`STRING ${stringLiteral} ${stringLiteral.slice(1, -1)}`);
+      } else {
+        reportUnterminatedString(); // Report error if string is not terminated
+      }
+
+      continue; // Skip the rest of the loop for this iteration
     }
 
     const nextChar = input[i + 1];
