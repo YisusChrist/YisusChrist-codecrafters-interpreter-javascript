@@ -2,25 +2,26 @@ import fs from "fs";
 
 // Tokenizer function to scan for parentheses and braces
 function tokenize(input) {
+  // Define a map of single-character tokens and their corresponding output
+  const tokenMap = {
+    "(": "LEFT_PAREN ( null",
+    ")": "RIGHT_PAREN ) null",
+    "{": "LEFT_BRACE { null",
+    "}": "RIGHT_BRACE } null",
+    "*": "STAR * null",
+    ".": "DOT . null",
+    ",": "COMMA , null",
+    "-": "MINUS - null",
+    "+": "PLUS + null",
+    ";": "SEMICOLON ; null",
+  };
+
   for (let i = 0; i < input.length; i++) {
     const char = input[i];
 
-    switch (char) {
-      case "(":
-        console.log("LEFT_PAREN ( null");
-        break;
-      case ")":
-        console.log("RIGHT_PAREN ) null");
-        break;
-      case "{":
-        console.log("LEFT_BRACE { null");
-        break;
-      case "}":
-        console.log("RIGHT_BRACE } null");
-        break;
-      default:
-        // Ignore other characters for now
-        break;
+    // Check if the character is a token we care about
+    if (tokenMap[char]) {
+      console.log(tokenMap[char]);
     }
   }
 
