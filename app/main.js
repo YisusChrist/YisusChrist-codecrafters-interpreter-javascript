@@ -1,6 +1,6 @@
 import fs from "fs";
 
-// Tokenizer function to scan for parentheses, braces, and other single-character tokens
+// Tokenizer function to scan for parentheses, braces, operators, and other single-character tokens
 function tokenize(input) {
   // Define a map of single-character tokens and their corresponding output
   const tokenMap = {
@@ -14,6 +14,7 @@ function tokenize(input) {
     "-": "MINUS - null",
     "+": "PLUS + null",
     ";": "SEMICOLON ; null",
+    "=": "EQUAL = null",
   };
 
   let hasError = false; // Flag to track if there are any errors
@@ -21,12 +22,22 @@ function tokenize(input) {
   for (let i = 0; i < input.length; i++) {
     const char = input[i];
 
+    // Handle the equality operator (==)
+    if (char === "=") {
+      if (i + 1 < input.length && input[i + 1] === "=") {
+        console.log("EQUAL_EQUAL == null");
+        i++; // Skip the next character since we've consumed it
+      } else {
+        console.log("EQUAL = null");
+      }
+    }
     // Check if the character is a valid token
-    if (tokenMap[char]) {
+    else if (tokenMap[char]) {
       console.log(tokenMap[char]); // Print valid tokens to stdout
     } else {
       // Report an error for invalid characters
-      if (!/\s/.test(char)) { // Ignore whitespace, but report invalid characters
+      if (!/\s/.test(char)) {
+        // Ignore whitespace, but report invalid characters
         console.error(`[line 1] Error: Unexpected character: ${char}`);
         hasError = true;
       }
