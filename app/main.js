@@ -61,7 +61,7 @@ function tokenize(input) {
     // Check if character is a valid token
     if (!tokenMap[char]) {
       reportError(char);
-    }
+    } else console.log(tokenMap[char]);
   }
 
   console.log("EOF  null");
@@ -135,9 +135,9 @@ function handleNumberLiteral(input, i) {
   let literalValue;
   if (isDecimal) {
     // Check if the number ends with all zeros after the decimal point
-    const decimalPart = numberLiteral.split('.')[1];
+    const decimalPart = numberLiteral.split(".")[1];
     if (decimalPart && parseInt(decimalPart) === 0) {
-      literalValue = `${numberLiteral.split('.')[0]}.0`; // e.g., "51.0000" becomes "51.0"
+      literalValue = `${numberLiteral.split(".")[0]}.0`; // e.g., "51.0000" becomes "51.0"
     } else {
       literalValue = numberLiteral; // e.g., "1234.1234" remains "1234.1234"
     }
