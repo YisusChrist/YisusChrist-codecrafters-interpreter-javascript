@@ -2,7 +2,6 @@ import fs from "fs";
 
 // Tokenizer function to scan for parentheses, braces, operators, and other single-character tokens
 function tokenize(input) {
-  // Define a map of single-character tokens and their corresponding output
   const tokenMap = {
     "(": "LEFT_PAREN ( null",
     ")": "RIGHT_PAREN ) null",
@@ -16,48 +15,59 @@ function tokenize(input) {
     ";": "SEMICOLON ; null",
     "=": "EQUAL = null",
     "!": "BANG ! null",
+    "<": "LESS < null",
+    ">": "GREATER > null",
   };
 
-  let hasError = false; // Flag to track if there are any errors
+  let hasError = false;
+
+  const handleRelationalOperators = (char, nextChar) => {
+    if (char === "<") {
+      console.log(nextChar === "=" ? "LESS_EQUAL <= null" : "LESS < null");
+    } else if (char === ">") {
+      console.log(
+        nextChar === "=" ? "GREATER_EQUAL >= null" : "GREATER > null"
+      );
+    }
+  };
+
+  const handleNegationOperator = (nextChar) => {
+    console.log(nextChar === "=" ? "BANG_EQUAL != null" : "BANG ! null");
+  };
+
+  const handleEqualityOperator = (nextChar) => {
+    console.log(nextChar === "=" ? "EQUAL_EQUAL == null" : "EQUAL = null");
+  };
+
+  const reportError = (char) => {
+    if (!/\s/.test(char)) {
+      console.error(`[line 1] Error: Unexpected character: ${char}`);
+      hasError = true;
+    }
+  };
 
   for (let i = 0; i < input.length; i++) {
     const char = input[i];
+    const nextChar = input[i + 1];
 
-    // Handle the negation operator (!)
-    if (char === "!") {
-      if (i + 1 < input.length && input[i + 1] === "=") {
-        console.log("BANG_EQUAL != null");
-        i++; // Skip the next character since we've consumed it
-      } else {
-        console.log("BANG ! null");
-      }
-    }
-    // Handle the equality operator (==)
-    else if (char === "=") {
-      if (i + 1 < input.length && input[i + 1] === "=") {
-        console.log("EQUAL_EQUAL == null");
-        i++; // Skip the next character since we've consumed it
-      } else {
-        console.log("EQUAL = null");
-      }
-    }
-    // Check if the character is a valid token
-    else if (tokenMap[char]) {
-      console.log(tokenMap[char]); // Print valid tokens to stdout
+    if (char === "<" || char === ">") {
+      handleRelationalOperators(char, nextChar);
+      if (nextChar === "=") i++; // Skip the next character
+    } else if (char === "!") {
+      handleNegationOperator(nextChar);
+      if (nextChar === "=") i++; // Skip the next character
+    } else if (char === "=") {
+      handleEqualityOperator(nextChar);
+      if (nextChar === "=") i++; // Skip the next character
+    } else if (tokenMap[char]) {
+      console.log(tokenMap[char]);
     } else {
-      // Report an error for invalid characters
-      if (!/\s/.test(char)) {
-        // Ignore whitespace, but report invalid characters
-        console.error(`[line 1] Error: Unexpected character: ${char}`);
-        hasError = true;
-      }
+      reportError(char);
     }
   }
 
-  // Print EOF token at the end
   console.log("EOF  null");
 
-  // If any errors were detected, exit with code 65
   if (hasError) {
     process.exit(65);
   }
