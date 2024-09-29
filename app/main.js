@@ -17,10 +17,11 @@ function tokenize(input) {
     "!": "BANG ! null",
     "<": "LESS < null",
     ">": "GREATER > null",
-    "/": "SLASH / null",
+    "/": "SLASH / null", // Add the division operator
   };
 
   let hasError = false;
+  let line = 1; // Start line number at 1
 
   const handleRelationalOperators = (char, nextChar) => {
     if (char === "<") {
@@ -41,10 +42,8 @@ function tokenize(input) {
   };
 
   const reportError = (char) => {
-    if (!/\s/.test(char)) {
-      console.error(`[line 1] Error: Unexpected character: ${char}`);
-      hasError = true;
-    }
+    console.error(`[line ${line}] Error: Unexpected character: ${char}`);
+    hasError = true;
   };
 
   for (let i = 0; i < input.length; i++) {
@@ -61,6 +60,7 @@ function tokenize(input) {
 
     // Ignore whitespace characters (spaces, tabs, and newlines)
     if (/\s/.test(char)) {
+      if (char === "\n") line++; // Increment line number on newlines
       continue; // Skip this iteration for whitespace
     }
 
@@ -77,8 +77,6 @@ function tokenize(input) {
       if (nextChar === "=") i++; // Skip the next character
     } else if (tokenMap[char]) {
       console.log(tokenMap[char]);
-    } else if (char === "/") {
-      console.log(tokenMap[char]); // Print SLASH token
     } else {
       reportError(char);
     }
