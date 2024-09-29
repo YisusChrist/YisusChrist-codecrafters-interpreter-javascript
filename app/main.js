@@ -17,6 +17,7 @@ function tokenize(input) {
     "!": "BANG ! null",
     "<": "LESS < null",
     ">": "GREATER > null",
+    "/": "SLASH / null",
   };
 
   let hasError = false;
@@ -48,6 +49,16 @@ function tokenize(input) {
 
   for (let i = 0; i < input.length; i++) {
     const char = input[i];
+
+    // Check for comments
+    if (char === "/" && input[i + 1] === "/") {
+      // Ignore everything after // until the end of the line
+      while (i < input.length && input[i] !== "\n") {
+        i++;
+      }
+      continue; // Skip the rest of the loop for this iteration
+    }
+
     const nextChar = input[i + 1];
 
     if (char === "<" || char === ">") {
@@ -61,6 +72,8 @@ function tokenize(input) {
       if (nextChar === "=") i++; // Skip the next character
     } else if (tokenMap[char]) {
       console.log(tokenMap[char]);
+    } else if (char === "/") {
+      console.log(tokenMap[char]); // Print SLASH token
     } else {
       reportError(char);
     }
