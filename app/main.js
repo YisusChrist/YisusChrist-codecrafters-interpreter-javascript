@@ -3,7 +3,7 @@ import fs from "fs";
 // Tokenizer function to scan for tokens
 function tokenize(input) {
   const tokenMap = createTokenMap();
-  let hasError = false;
+  let errorState = { hasError: false }; // Use an object to track error state
   let line = 1; // Start line number at 1
 
   const handleComment = (i) => {
@@ -20,7 +20,12 @@ function tokenize(input) {
 
   const reportError = (char) => {
     console.error(`[line ${line}] Error: Unexpected character: ${char}`);
-    hasError = true;
+    errorState.hasError = true;
+  };
+
+  const reportUnterminatedString = () => {
+    console.error(`[line ${line}] Error: Unterminated string.`);
+    errorState.hasError = true;
   };
 
   for (let i = 0; i < input.length; i++) {
@@ -40,7 +45,7 @@ function tokenize(input) {
 
     // Handle string literals
     if (char === '"') {
-      i = handleStringLiteral(input, i, line, hasError);
+      i = handleStringLiteral(input, i, reportUnterminatedString, errorState);
       continue;
     }
 
@@ -65,7 +70,7 @@ function tokenize(input) {
 
   console.log("EOF  null");
 
-  if (hasError) {
+  if (errorState.hasError) {
     process.exit(65);
   }
 }
@@ -91,12 +96,7 @@ function createTokenMap() {
   };
 }
 
-function reportUnterminatedString(line) {
-  console.error(`[line ${line}] Error: Unterminated string.`);
-  return true;
-}
-
-function handleStringLiteral(input, i, line, hasError) {
+function handleStringLiteral(input, i, reportUnterminatedString, errorState) {
   let stringLiteral = '"'; // Start with the opening quote
   i++; // Move past the opening quote
 
@@ -110,7 +110,7 @@ function handleStringLiteral(input, i, line, hasError) {
     stringLiteral += '"'; // Close the string literal
     console.log(`STRING ${stringLiteral} ${stringLiteral.slice(1, -1)}`);
   } else {
-    hasError = reportUnterminatedString(line); // Report error if string is not terminated
+    reportUnterminatedString(); // Report error if string is not terminated
   }
 
   return i; // Return updated index
