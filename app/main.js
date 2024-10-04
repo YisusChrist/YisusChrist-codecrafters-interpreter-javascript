@@ -23,11 +23,6 @@ function tokenize(input) {
     hasError = true;
   };
 
-  const reportUnterminatedString = () => {
-    console.error(`[line ${line}] Error: Unterminated string.`);
-    hasError = true;
-  };
-
   for (let i = 0; i < input.length; i++) {
     const char = input[i];
 
@@ -94,6 +89,11 @@ function createTokenMap() {
     ">": "GREATER > null",
     "/": "SLASH / null",
   };
+}
+
+function reportUnterminatedString() {
+  console.error(`[line ${line}] Error: Unterminated string.`);
+  hasError = true;
 }
 
 function handleStringLiteral(input, i) {
