@@ -40,7 +40,7 @@ function tokenize(input) {
 
     // Handle string literals
     if (char === '"') {
-      i = handleStringLiteral(input, i);
+      i = handleStringLiteral(input, i, line, hasError);
       continue;
     }
 
@@ -91,12 +91,12 @@ function createTokenMap() {
   };
 }
 
-function reportUnterminatedString() {
+function reportUnterminatedString(line) {
   console.error(`[line ${line}] Error: Unterminated string.`);
-  hasError = true;
+  return true;
 }
 
-function handleStringLiteral(input, i) {
+function handleStringLiteral(input, i, line, hasError) {
   let stringLiteral = '"'; // Start with the opening quote
   i++; // Move past the opening quote
 
@@ -110,7 +110,7 @@ function handleStringLiteral(input, i) {
     stringLiteral += '"'; // Close the string literal
     console.log(`STRING ${stringLiteral} ${stringLiteral.slice(1, -1)}`);
   } else {
-    reportUnterminatedString(); // Report error if string is not terminated
+    hasError = reportUnterminatedString(line); // Report error if string is not terminated
   }
 
   return i; // Return updated index
