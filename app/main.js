@@ -102,6 +102,27 @@ function createTokenMap() {
   };
 }
 
+function createReservedWordsMap() {
+  return {
+    and: "AND and null",
+    class: "CLASS class null",
+    else: "ELSE else null",
+    false: "FALSE false null",
+    for: "FOR for null",
+    fun: "FUN fun null",
+    if: "IF if null",
+    nil: "NIL nil null",
+    or: "OR or null",
+    print: "PRINT print null",
+    return: "RETURN return null",
+    super: "SUPER super null",
+    this: "THIS this null",
+    true: "TRUE true null",
+    var: "VAR var null",
+    while: "WHILE while null",
+  };
+}
+
 function handleStringLiteral(input, i, line, reportUnterminatedString) {
   let stringLiteral = '"'; // Start with the opening quote
   i++; // Move past the opening quote
@@ -179,14 +200,6 @@ function handleOperators(char, nextChar, i) {
     default:
       return null; // No operator handling needed
   }
-}
-
-function createReservedWordsMap() {
-  return {
-    foo: "IDENTIFIER foo null",
-    bar: "IDENTIFIER bar null",
-    _hello: "IDENTIFIER _hello null",
-  };
 }
 
 function isAlpha(char) {
