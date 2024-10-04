@@ -56,12 +56,16 @@ function tokenize(input) {
     }
 
     const nextChar = input[i + 1];
-    i = handleOperators(char, nextChar, i) || i;
+    const handledOperator = handleOperators(char, nextChar, i);
+    // If an operator is handled, skip the token map check and continue the loop
+    if (handledOperator !== null) {
+      i = handledOperator;
+      continue;
+    }
 
     // Check if character is a valid token
-    if (!tokenMap[char]) {
-      reportError(char);
-    } else console.log(tokenMap[char]);
+    if (!tokenMap[char]) reportError(char);
+    else console.log(tokenMap[char]);
   }
 
   console.log("EOF  null");
