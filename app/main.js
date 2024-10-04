@@ -3,6 +3,7 @@ import fs from "fs";
 // Tokenizer function to scan for tokens
 function tokenize(input) {
   const tokenMap = createTokenMap();
+  const reservedWords = createReservedWordsMap(); // Reserved words
   let errorState = { hasError: false }; // Use an object to track error state
   let line = 1; // Start line number at 1
 
@@ -45,13 +46,18 @@ function tokenize(input) {
 
     // Handle string literals
     if (char === '"') {
-      i = handleStringLiteral(input, i, reportUnterminatedString, errorState);
+      i = handleStringLiteral(input, i, line, reportUnterminatedString);
       continue;
     }
 
     // Handle number literals
     if (/\d/.test(char)) {
       i = handleNumberLiteral(input, i);
+      continue;
+    }
+
+    if (isAlpha(char)) {
+      i = handleIdentifier(input, i, reservedWords);
       continue;
     }
 
@@ -96,7 +102,7 @@ function createTokenMap() {
   };
 }
 
-function handleStringLiteral(input, i, reportUnterminatedString, errorState) {
+function handleStringLiteral(input, i, line, reportUnterminatedString) {
   let stringLiteral = '"'; // Start with the opening quote
   i++; // Move past the opening quote
 
@@ -173,6 +179,41 @@ function handleOperators(char, nextChar, i) {
     default:
       return null; // No operator handling needed
   }
+}
+
+function createReservedWordsMap() {
+  return {
+    foo: "IDENTIFIER foo null",
+    bar: "IDENTIFIER bar null",
+    _hello: "IDENTIFIER _hello null",
+  };
+}
+
+function isAlpha(char) {
+  return /^[a-zA-Z_]$/.test(char);
+}
+
+function isAlphaNumeric(char) {
+  return /^[a-zA-Z0-9_]$/.test(char);
+}
+
+function handleIdentifier(input, i, reservedWords) {
+  let identifier = input[i]; // Start with the first character
+  i++;
+
+  while (i < input.length && isAlphaNumeric(input[i])) {
+    identifier += input[i];
+    i++;
+  }
+
+  // Check if it's a reserved word
+  if (reservedWords[identifier]) {
+    console.log(reservedWords[identifier]);
+  } else {
+    console.log(`IDENTIFIER ${identifier} null`);
+  }
+
+  return i - 1; // Return the updated index
 }
 
 // Handle command-line arguments
